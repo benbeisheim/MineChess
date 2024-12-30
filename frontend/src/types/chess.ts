@@ -11,7 +11,7 @@ export type PieceType = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king'
 export type PlayerColor = 'white' | 'black';
 
 // Represents a chess piece with all its properties
-export interface Piece {
+export interface PieceData {
     type: PieceType;
     color: PlayerColor;
     position: Position;
@@ -20,34 +20,39 @@ export interface Piece {
 
 // Represents the complete state of a chess game
 export interface GameState {
-    board: Board;
-    currentTurn: PlayerColor;
+    boardState: BoardState;
+    toMove: PlayerColor;
     moveHistory: Move[];
-    capturedPieces: Piece[];
+    capturedPieces: PieceData[];
     isCheck: boolean;
     isCheckmate: boolean;
     isStalemate: boolean;
+    selectedSquare: Position | null;
+    legalMoves: Position[];
+    enPassantTarget: Position | null;
 }
 
 // Represents the chess board as a 2D grid of squares
-export interface Board {
-    squares: Square[][];  // 8x8 grid
+export interface BoardState {
+    board: (PieceData | null) [][];
+    blackKingPosition: Position;
+    whiteKingPosition: Position;
 }
 
 // Represents a single square on the board
 export interface Square {
     position: Position;
-    piece: Piece | null;  // null means empty square
+    piece: PieceData | null;  // null means empty square
     isHighlighted: boolean;  // For showing possible moves
     isSelected: boolean;  // For showing the selected piece
 }
 
 // Represents a move in chess notation, contains necessary information for game reconstruction (makeMove/unMakeMove)
 export interface Move {
-    piece: Piece;
+    piece: PieceData;
     from: Position;
     to: Position;
-    capturedPiece?: Piece;  // Optional - present if a piece was captured
+    capturedPiece?: PieceData;  // Optional - present if a piece was captured
     rookMove?: {
         from: Position;
         to: Position;
@@ -59,7 +64,7 @@ export interface Move {
 // Defines the shape of our game logic handlers
 export interface GameRules {
     isLegalMove(from: Position, to: Position, gameState: GameState): boolean;
-    calculateLegalMoves(piece: Piece, gameState: GameState): Position[];
+    calculateLegalMoves(piece: PieceData, gameState: GameState): Position[];
     isCheck(gameState: GameState): boolean;
     isCheckmate(gameState: GameState): boolean;
     isStalemate(gameState: GameState): boolean;
