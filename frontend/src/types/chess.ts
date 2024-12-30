@@ -25,11 +25,10 @@ export interface GameState {
     moveHistory: Move[];
     capturedPieces: PieceData[];
     isCheck: boolean;
-    isCheckmate: boolean;
-    isStalemate: boolean;
     selectedSquare: Position | null;
     legalMoves: Position[];
     enPassantTarget: Position | null;
+    resolve: 'checkmate' | 'stalemate' | null;
 }
 
 // Represents the chess board as a 2D grid of squares

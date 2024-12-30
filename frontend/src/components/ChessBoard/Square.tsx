@@ -1,6 +1,7 @@
 import React from 'react';
 import { Position, PieceData, PlayerColor } from '../../types/chess';
 import { Piece } from '../Piece/Piece';
+import { SquareHighlight } from './SquareHighlight';
 
 interface SquareProps {
     position: Position;
@@ -27,8 +28,6 @@ const Square: React.FC<SquareProps> = ({
 }) => {
     // Make the color classes more specific to ensure they apply
     const baseColor = isLight ? 'bg-amber-100' : 'bg-amber-800';
-    const highlightClass = isHighlighted ? 'ring-2 ring-blue-400' : '';
-    const selectedClass = isSelected ? 'ring-2 ring-blue-600' : '';
     
     // Determine if this square should show labels
     const shouldShowFileLabel = orientation === 'white' ? position.y === 7 : position.y === 0;
@@ -39,7 +38,7 @@ const Square: React.FC<SquareProps> = ({
     
     return (
         <div 
-            className={`${baseColor} ${highlightClass} ${selectedClass} 
+            className={`${baseColor}
                        relative flex items-center justify-center`}
             style={{
                 width: `${squareSize}px`,
@@ -48,11 +47,13 @@ const Square: React.FC<SquareProps> = ({
             data-square={notation}
             onClick={onSquareClick}
         >
-             {piece && (
+            {isHighlighted && <SquareHighlight size={squareSize} isPiece={piece !== null} isLight={isLight} />}
+            {piece && (
                 <Piece 
                     type={piece.type}
                     color={piece.color}
                     size={squareSize}
+                    isSelected={isSelected}
                 />
             )}
             {shouldShowFileLabel && (

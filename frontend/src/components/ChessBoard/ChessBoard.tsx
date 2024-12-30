@@ -50,14 +50,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
             // Apply maximum size constraint
             newSize = Math.min(newSize, Math.floor(maxSize / 9));
             
-            console.log('Calculated dimensions:', {
-                containerWidth,
-                containerHeight,
-                maxSquareWidth,
-                maxSquareHeight,
-                newSize
-            });
-            
             setSquareSize(newSize);
         };
     
