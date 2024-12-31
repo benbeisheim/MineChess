@@ -45,5 +45,4 @@ export function executeMove(from: Position, to: Position, gameState: GameState) 
     } else if (!gameState.isCheck && isNoLegalMoves(gameState)) {
         gameState.resolve = 'stalemate';
     }
-    return gameState
 }

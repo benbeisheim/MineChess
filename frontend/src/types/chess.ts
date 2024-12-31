@@ -29,6 +29,14 @@ export interface GameState {
     legalMoves: Position[];
     enPassantTarget: Position | null;
     resolve: 'checkmate' | 'stalemate' | null;
+    clock: {
+        white: number;
+        black: number;
+    };
+    players: {
+        white: PlayerData;
+        black: PlayerData;
+    };
 }
 
 // Represents the chess board as a 2D grid of squares
@@ -77,4 +85,8 @@ export interface GameAction {
         to?: Position;
         promotionChoice?: PieceType;
     };
+}
+
+export interface PlayerData {
+    name: string;
 }
