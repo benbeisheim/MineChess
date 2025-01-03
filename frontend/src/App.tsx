@@ -2,10 +2,10 @@ import LocalGame from './components/Game/LocalGame';
 
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-[min(90vw,90vh)] aspect-square">
+    <div className="min-h-screen  bg-dark-gray">
+      <main className="flex justify-center items-center h-full">
         <LocalGame />
-      </div>
+      </main>
     </div>
   );
 }

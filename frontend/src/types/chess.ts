@@ -10,6 +10,12 @@ export type PieceType = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king'
 // Defines the two possible colors in chess
 export type PlayerColor = 'white' | 'black';
 
+// Represents a chess player with all its properties
+export interface Player {
+    name: string;
+    color: PlayerColor;
+}
+
 // Represents a chess piece with all its properties
 export interface PieceData {
     type: PieceType;
@@ -37,6 +43,7 @@ export interface GameState {
         white: PlayerData;
         black: PlayerData;
     };
+    promotionSquare: Position | null;
 }
 
 // Represents the chess board as a 2D grid of squares

@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Square from './Square';
-import { Position, PlayerColor, GameState } from '../../types/chess';
+import { Position, PlayerColor } from '../../types/chess';
+import { useAppSelector } from '../../store/hooks';
+import { RootState } from '../../store';
 
 // The board dimensions are defined as constants to make the code more maintainable
 const BOARD_SIZE = 8;
@@ -10,7 +12,6 @@ const RANKS = ['1', '2', '3', '4', '5', '6', '7', '8'].reverse(); // Reversed fo
 interface ChessBoardProps {
     // We'll expand this interface as we add more functionality
     orientation: PlayerColor;
-    gameState: GameState;
     onSquareClick: (position: Position) => void;
     maxSize?: number;
     padding?: number;
@@ -18,11 +19,17 @@ interface ChessBoardProps {
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ 
     orientation,
-    gameState,
     onSquareClick,
-    maxSize = 1000,
-    padding = 16 
+    maxSize = 1800,
+    padding = 0 
 }) => {
+    // Access necessary game state via Redux
+    const { boardState, selectedSquare, legalMoves } = useAppSelector((state: RootState) => ({
+        boardState: state.game.boardState,
+        selectedSquare: state.game.selectedSquare,
+        legalMoves: state.game.legalMoves,
+    }));
+
     const containerRef = useRef<HTMLDivElement>(null);
     const [squareSize, setSquareSize] = useState(64);
 
@@ -67,8 +74,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         
         return () => resizeObserver.disconnect();
     }, [maxSize, padding]);
-
-    const { boardState, toMove, selectedSquare, legalMoves } = gameState;
     
     // Function to determine if a square should be light or dark
     const isLightSquare = (x: number, y: number): boolean => {
@@ -132,14 +137,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     };
 
     return (
-        <div ref={containerRef} className="inline-flex w-full h-full bg-slate-100 rounded-lg shadow-lg p-4 items-center justify-center">
+        <div ref={containerRef}>
             <div className="inline-flex flex-col">
-                <div className="inline-flex flex-row justify-center items-center">
-                    <p className="text-2xl font-bold border-l-amber-950">{toMove}</p>
-                </div>
-                <div className="inline-flex flex-col">
-                    {renderBoard()}
-                </div>
+                {renderBoard()}
             </div>
         </div>
     );
