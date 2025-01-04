@@ -41,6 +41,7 @@ const gameSlice = createSlice({
         },
         // Handle selecting a square
         selectSquare(state, action: PayloadAction<Position>): GameState {
+            console.log('selectSquare', action.payload);
             const piece = state.boardState.board[action.payload.y][action.payload.x];
             const position = action.payload;
 
@@ -73,8 +74,6 @@ const gameSlice = createSlice({
                     } 
                     // execute move
                     executeMove(state.selectedSquare, position, state);
-                    state.selectedSquare = null;
-                    state.legalMoves = [];
                     return state;
                 } else {
                     // unselect the piece
@@ -100,8 +99,6 @@ const gameSlice = createSlice({
                     } 
                     // execute move
                     executeMove(state.selectedSquare, position, state);
-                    state.selectedSquare = null;
-                    state.legalMoves = [];
                     return state;
                 } else {
                     // unselect the piece

@@ -2,9 +2,10 @@ import React from 'react';
 import { Position, PieceData, PlayerColor } from '../../types/chess';
 import { Piece } from '../Piece/Piece';
 import { SquareHighlight } from './SquareHighlight';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { RootState } from '../../store';
 import PromotionChoice from '../Piece/PromotionChoice';
+import { selectSquare } from '../../store/gameSlice';
 
 interface SquareProps {
     position: Position;
@@ -29,7 +30,9 @@ const Square: React.FC<SquareProps> = ({
     squareSize,
     onSquareClick
 }) => {
-    const promotionSquare = useAppSelector((state: RootState) => state.game.promotionSquare);
+    const { promotionSquare } = useAppSelector((state: RootState) => state.game);
+    const dispatch = useAppDispatch();
+
     const isPromotionSquare = promotionSquare && promotionSquare.x === position.x && promotionSquare.y === position.y;
     // Make the color classes more specific to ensure they apply
     const baseColor = isLight ? 'bg-amber-100' : 'bg-amber-800';
@@ -59,6 +62,9 @@ const Square: React.FC<SquareProps> = ({
                     color={piece.color}
                     size={squareSize}
                     isSelected={isSelected}
+                    onDragStart={() => {
+                        dispatch(selectSquare(position));
+                    }}
                 />
             )}
             {isPromotionSquare && ( <PromotionChoice /> )}

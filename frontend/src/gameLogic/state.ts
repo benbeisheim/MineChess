@@ -49,6 +49,9 @@ export function executeMove(from: Position, to: Position, gameState: GameState) 
     }
     // add move to history
     gameState.moveHistory.push(move);
+    // set selected square to null and legal moves to empty array
+    gameState.selectedSquare = null;
+    gameState.legalMoves = [];
 }
 
 function getNotation(from: Position, to: Position, gameState: GameState) {
