@@ -8,9 +8,9 @@ const PlayerCard: React.FC<{
     player: Player;
 }> = ({ player }) => {
     const dispatch = useAppDispatch();
-    const { clock, toMove } = useAppSelector((state: RootState) => state.game);
+    const { clock, toMove, resolve } = useAppSelector((state: RootState) => state.game);
     const timeLeft = clock[player.color];
-    const isActive = timeLeft > 0 && toMove === player.color;
+    const isActive = !resolve && timeLeft > 0 && toMove === player.color;
 
     return (
         <div className="flex w-full border-2 border-neutral-500">

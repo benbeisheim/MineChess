@@ -1,3 +1,5 @@
+import { RootState } from '../../store';
+import { useAppSelector } from '../../store/hooks';
 import { PieceType, PlayerColor } from '../../types/chess';
 import { getPieceImage } from '../../utils/pieces';
 import { useEffect, useRef, useState } from 'react';
@@ -16,6 +18,7 @@ export const Piece: React.FC<PieceProps> = ({ type, color, size, isSelected, onD
     // State to track if we're dragging and the current position
     const [isDragging, setIsDragging] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
+    const { toMove } = useAppSelector((state: RootState) => state.game);
     
     // Reference to the piece element for getting its initial position
     const pieceRef = useRef<HTMLDivElement>(null);
@@ -66,8 +69,10 @@ export const Piece: React.FC<PieceProps> = ({ type, color, size, isSelected, onD
     }, [isDragging]);
 
     const handleMouseDown = () => {
-        setIsDragging(true);
-        onDragStart();
+        if (color === toMove) {
+            setIsDragging(true);
+            onDragStart();
+        }
     };
 
     return (
