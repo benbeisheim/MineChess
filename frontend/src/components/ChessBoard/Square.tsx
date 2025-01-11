@@ -1,5 +1,5 @@
 import React from 'react';
-import { Position, PieceData, PlayerColor } from '../../types/chess';
+import { Position, PieceData, PlayerColor, PieceType } from '../../types/chess';
 import { Piece } from '../Piece/Piece';
 import { SquareHighlight } from './SquareHighlight';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -17,6 +17,7 @@ interface SquareProps {
     notation: string;
     squareSize: number;
     onSquareClick?: () => void;
+    handlePromotionClick: (pieceType: PieceType) => void;
 }
 
 const Square: React.FC<SquareProps> = ({
@@ -28,7 +29,8 @@ const Square: React.FC<SquareProps> = ({
     orientation,
     notation,
     squareSize,
-    onSquareClick
+    onSquareClick,
+    handlePromotionClick
 }) => {
     const { promotionSquare } = useAppSelector((state: RootState) => state.game);
     const dispatch = useAppDispatch();
@@ -63,11 +65,11 @@ const Square: React.FC<SquareProps> = ({
                     size={squareSize}
                     isSelected={isSelected}
                     onDragStart={() => {
-                        dispatch(selectSquare(position));
+                        dispatch(selectSquare({position: position, playerColor: orientation}));
                     }}
                 />
             )}
-            {isPromotionSquare && ( <PromotionChoice /> )}
+            {isPromotionSquare && ( <PromotionChoice handlePromotionClick={handlePromotionClick} orientation={orientation} /> )}
             {shouldShowFileLabel && (
                 <div 
                     className={"absolute bottom-1 right-1 georgia " + (isLight ? "text-amber-800" : "text-amber-100")} 

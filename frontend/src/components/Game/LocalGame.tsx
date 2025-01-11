@@ -1,3 +1,4 @@
+/*
 import { useEffect } from 'react';
 import { useAppDispatch } from '../../store/hooks';
 import { initializeBoard } from '../../store/gameSlice';
@@ -12,7 +13,8 @@ const LocalGame: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <ChessGame />
+        <ChessGame gameId={'local'} playerColor={"white"}/>
     );
 };
 export default LocalGame;
+*/

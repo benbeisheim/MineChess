@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Square from './Square';
-import { Position, PlayerColor } from '../../types/chess';
+import { Position, PlayerColor, PieceType } from '../../types/chess';
 import { useAppSelector } from '../../store/hooks';
 import { RootState } from '../../store';
 
@@ -15,13 +15,15 @@ interface ChessBoardProps {
     onSquareClick: (position: Position) => void;
     maxSize?: number;
     padding?: number;
+    handlePromotionClick: (pieceType: PieceType) => void;
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ 
     orientation,
     onSquareClick,
     maxSize = 1800,
-    padding = 0 
+    padding = 0,
+    handlePromotionClick
 }) => {
     // Access necessary game state via Redux
     const { boardState, selectedSquare, legalMoves } = useAppSelector((state: RootState) => ({
@@ -119,7 +121,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     const renderSquare = (position: Position) => {
         const piece = boardState.board[position.y][position.x];
         const isSelected = selectedSquare?.x === position.x && selectedSquare?.y === position.y;
-        
         return (
             <Square 
                 key={`${position.x}-${position.y}`}
@@ -132,6 +133,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
                 squareSize={squareSize}
                 orientation={orientation}
                 onSquareClick={() => onSquareClick(position)}
+                handlePromotionClick={handlePromotionClick}
             />
         );
     };

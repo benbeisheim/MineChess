@@ -67,8 +67,8 @@ export const getInitialPosition = (): BoardState => {
 
     return {
         board,
-        blackKingPosition: { x: 4, y: 0 },
-        whiteKingPosition: { x: 4, y: 7 }
+        blackKingPosition: { x: 0, y: 4 },
+        whiteKingPosition: { x: 7, y: 4 }
     };
 };
 

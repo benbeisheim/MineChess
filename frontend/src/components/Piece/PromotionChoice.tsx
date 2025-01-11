@@ -1,17 +1,19 @@
-import { RootState } from '../../store';
-import { promotePiece } from '../../store/gameSlice';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { PieceType, PlayerColor } from '../../types/chess';
 import { getPieceImage } from '../../utils/pieces';
 
-const PromotionChoice: React.FC = () => {
-    const color = useAppSelector((state: RootState) => state.game.toMove);
-    const dispatch = useAppDispatch();
+interface PromotionChoiceProps {
+    handlePromotionClick: (pieceType: PieceType) => void;
+    orientation: PlayerColor;
+}
+
+const PromotionChoice: React.FC<PromotionChoiceProps> = ({handlePromotionClick, orientation}) => {
+    const color = orientation === 'white' ? 'white' : 'black';
     return (
         <div className="w-full h-full grid grid-cols-2 grid-rows-2">
-            <img className="w-full h-full" src={getPieceImage(color, 'queen')} onClick={() => dispatch(promotePiece({pieceType: 'queen'}))}/>
-            <img className="w-full h-full" src={getPieceImage(color, 'rook')} onClick={() => dispatch(promotePiece({pieceType: 'rook'}))}/>
-            <img className="w-full h-full" src={getPieceImage(color, 'bishop')} onClick={() => dispatch(promotePiece({pieceType: 'bishop'}))}/>
-            <img className="w-full h-full" src={getPieceImage(color, 'knight')} onClick={() => dispatch(promotePiece({pieceType: 'knight'}))}/>
+            <img className="w-full h-full" src={getPieceImage(color, 'queen')} onClick={() => handlePromotionClick('queen')}/>
+            <img className="w-full h-full" src={getPieceImage(color, 'rook')} onClick={() => handlePromotionClick('rook')}/>
+            <img className="w-full h-full" src={getPieceImage(color, 'bishop')} onClick={() => handlePromotionClick('bishop')}/>
+            <img className="w-full h-full" src={getPieceImage(color, 'knight')} onClick={() => handlePromotionClick('knight')}/>
         </div>
     );
 }

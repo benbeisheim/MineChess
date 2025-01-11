@@ -3,8 +3,11 @@ import { boundaryCheck, getPseudoLegalMoves } from "./moves";
 
 export function getLegalMoves(position: Position, gameState: GameState) : Position[] {
     // Gets pseudo-legal moves and filters out those that leave king in check
+    console.log("Getting legal moves for", position);
     const pseudoLegalMoves = getPseudoLegalMoves(position, gameState);
+    console.log("Pseudo-legal moves:", pseudoLegalMoves);
     const legalMoves = filterMovesForCheck(position, pseudoLegalMoves, gameState);
+    console.log("Legal moves:", legalMoves);
     return legalMoves
 }
 

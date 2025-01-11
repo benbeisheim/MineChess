@@ -16,6 +16,12 @@ export interface Player {
     color: PlayerColor;
 }
 
+export interface WSMove {
+    from: Position;
+    to: Position;
+    promotion?: PieceType;
+}
+
 // Represents a chess piece with all its properties
 export interface PieceData {
     type: PieceType;
@@ -29,21 +35,26 @@ export interface GameState {
     boardState: BoardState;
     toMove: PlayerColor;
     moveHistory: Move[];
-    capturedPieces: PieceData[];
+    capturedPieces: CapturedPieces;
     isCheck: boolean;
     selectedSquare: Position | null;
     legalMoves: Position[];
     enPassantTarget: Position | null;
-    resolve: 'checkmate' | 'stalemate' | null;
+    resolve: 'checkmate' | 'draw' | null;
     clock: {
         white: number;
         black: number;
     };
     players: {
-        white: PlayerData;
-        black: PlayerData;
+        white: string;
+        black: string;
     };
     promotionSquare: Position | null;
+}
+
+export interface CapturedPieces {
+    white: PieceData[];
+    black: PieceData[];
 }
 
 // Represents the chess board as a 2D grid of squares
@@ -62,17 +73,22 @@ export interface Square {
 }
 
 // Represents a move in chess notation, contains necessary information for game reconstruction (makeMove/unMakeMove)
-export interface Move {
+export interface Ply {
     piece: PieceData;
     from: Position;
     to: Position;
     capturedPiece?: PieceData;  // Optional - present if a piece was captured
-    rookMove?: {
+    castleRookMove?: {
         from: Position;
         to: Position;
     };
-    promotedTo?: PieceType;
+    promoted?: PieceType;
     notation: string;  // Chess notation (e.g., "e4", "Nxf3")
+}
+
+export interface Move {
+    whitePly: Ply;
+    blackPly: Ply;
 }
 
 // Defines the shape of our game logic handlers
@@ -92,8 +108,4 @@ export interface GameAction {
         to?: Position;
         promotionChoice?: PieceType;
     };
-}
-
-export interface PlayerData {
-    name: string;
 }

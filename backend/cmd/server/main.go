@@ -1,114 +1,69 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"sync"
 
+	"github.com/benbeisheim/MineChess/backend/internal/controller"
+	"github.com/benbeisheim/MineChess/backend/internal/middleware"
+	"github.com/benbeisheim/MineChess/backend/internal/service"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/websocket/v2"
 )
 
-type GameManager struct {
-	games map[string]*Game
-	mu    sync.RWMutex
-}
-
-type Game struct {
-	ID          string
-	White       *Player
-	Black       *Player
-	Board       *Board
-	ToMove      string
-	MoveHistory []Move
-	Mines       map[string]Position
-	mu          sync.Mutex
-}
-
-type Player struct {
-	ID       string
-	Color    string
-	Conn     *websocket.Conn
-	TimeLeft int
-}
-
-type Board struct {
-	Squares [][]Square
-}
-
-type Square struct {
-	Position Position
-	Piece    *Piece
-}
-
-type Piece struct {
-	Type  string
-	Color string
-}
-
-type Position struct {
-	X int
-	Y int
-}
-
-type Move struct {
-	From Position
-	To   Position
-}
-
 func main() {
-	app := fiber.New()
-	gameManager := &GameManager{
-		games: make(map[string]*Game),
-	}
+	// Initialize the application
 
-	// Middleware to check if request is websocket
-	app.Use("/ws", func(c *fiber.Ctx) error {
-		if websocket.IsWebSocketUpgrade(c) {
-			c.Locals("allowed", true)
-			return c.Next()
-		}
-		return fiber.ErrUpgradeRequired
+	app := fiber.New()
+
+	// Then add the CORS middleware
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:5173", // Your React app's exact origin
+		AllowHeaders:     "Origin, Content-Type, Accept",
+		AllowMethods:     "GET, POST, OPTIONS",
+		AllowCredentials: true,
+	}))
+	// Debugging middleware
+	app.Use(func(c *fiber.Ctx) error {
+		fmt.Println("--------------------------------")
+		fmt.Printf("Incoming request to path: %s\n", c.Path())
+		fmt.Printf("Method: %s\n", c.Method())
+		fmt.Printf("Headers: %v\n", c.GetReqHeaders())
+		fmt.Println("--------------------------------")
+		return c.Next()
 	})
 
-	// WebSocket endpoint for game connections
+	// Initialize services
+	gameManager := service.NewGameManager()
+	gameService := service.NewGameService(gameManager)
+
+	// Initialize controllers
+	gameController := controller.NewGameController(gameService)
+	wsController := controller.NewWebSocketController(gameService)
+
+	// Set up WebSocket routes
+	app.Use("/ws/*", middleware.EnsurePlayerID())
 	app.Get("/ws/game/:gameId", websocket.New(func(c *websocket.Conn) {
-		// Get game ID from params
-		gameId := c.Params("gameId")
-
-		// Handle websocket connection
-		defer c.Close()
-
-		for {
-			messageType, message, err := c.ReadMessage()
-			if err != nil {
-				log.Println("read:", err)
-				break
-			}
-			// Handle different message types...
-
-			// Example echo
-			if err := c.WriteMessage(messageType, message); err != nil {
-				log.Println("write:", err)
-				break
-			}
-		}
+		fmt.Printf("WebSocket connection established for game: %s\n", c.Params("gameId"))
+		wsController.HandleConnection(c)
+	}, websocket.Config{
+		// Add some WebSocket-specific configuration
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		// Enable all origins during development
+		Origins: []string{"http://localhost:5173"},
 	}))
 
-	// REST endpoints
-	api := app.Group("/api")
+	// Set up REST routes
+	api := app.Group("/api", middleware.EnsurePlayerID())
 
-	// Create new game
-	api.Post("/game/create", gameController.createGame)
-
-	// Join existing game
-	api.Post("/game/join/:gameId", func(c *fiber.Ctx) error {
-		gameId := c.Params("gameId")
-		// Join game logic
-		return c.JSON(fiber.Map{
-			"gameId": gameId,
-			"color":  "white", // or black
-		})
-	})
+	// Game routes
+	gameRoutes := api.Group("/game")
+	gameRoutes.Post("/matchmaking/join", gameController.JoinMatchmaking)
+	gameRoutes.Post("/create", gameController.CreateGame)
+	gameRoutes.Post("/join/:gameId", gameController.JoinGame)
+	gameRoutes.Get("/:gameId", gameController.GetGameState)
 
 	log.Fatal(app.Listen(":3000"))
 }
